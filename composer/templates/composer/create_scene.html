@@ -1,0 +1,39 @@
+{% extends 'composer/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <h2>Create New Scene</h2>
+        
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        {{ form.title.label_tag }}
+                        {{ form.title }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.background.label_tag }}
+                        {{ form.background }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.character.label_tag }}
+                        {{ form.character }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.character_position.label_tag }}
+                        {{ form.character_position }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.action_description.label_tag }}
+                        {{ form.action_description }}
+                        <div class="form-text">Describe what action the character should be performing in the scene.</div>
+                    </div>
+                    <button type="submit" class="btn btn-success">Generate Scene</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

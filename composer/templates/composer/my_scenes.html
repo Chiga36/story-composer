@@ -1,0 +1,36 @@
+{% extends 'composer/base.html' %}
+
+{% block content %}
+<h2>My Scenes</h2>
+
+<div class="row">
+    {% for scene in scenes %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                {% if scene.generated_image_url %}
+                    <img src="{{ scene.generated_image_url }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ scene.title }}</h5>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            Background: {{ scene.background.name }}<br>
+                            Character: {{ scene.character.name }}<br>
+                            Position: {{ scene.get_character_position_display }}
+                        </small>
+                    </p>
+                    <p class="card-text">{{ scene.action_description|truncatewords:10 }}</p>
+                    <a href="{% url 'scene_result' scene.id %}" class="btn btn-primary btn-sm">View Details</a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12">
+            <div class="text-center">
+                <p>No scenes created yet.</p>
+                <a href="{% url 'create_scene' %}" class="btn btn-success">Create Your First Scene</a>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

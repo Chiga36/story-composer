@@ -1,0 +1,44 @@
+{% extends 'composer/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto text-center">
+        <h1>Welcome to Scene Composer</h1>
+        <p class="lead">Create amazing scenes by combining your custom backgrounds and characters with AI-powered image generation.</p>
+        
+        {% if user.is_authenticated %}
+            <div class="row mt-5">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5>Backgrounds</h5>
+                            <p>Create and manage your background scenes</p>
+                            <a href="{% url 'backgrounds' %}" class="btn btn-primary">Manage Backgrounds</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5>Characters</h5>
+                            <p>Create and manage your characters</p>
+                            <a href="{% url 'characters' %}" class="btn btn-primary">Manage Characters</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5>Create Scene</h5>
+                            <p>Compose backgrounds and characters</p>
+                            <a href="{% url 'create_scene' %}" class="btn btn-success">Create Scene</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn btn-primary btn-lg">Get Started</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

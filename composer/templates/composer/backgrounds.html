@@ -1,0 +1,78 @@
+{% extends 'composer/base.html' %}
+
+{% block content %}
+<h2>My AI-Generated Backgrounds</h2>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="row">
+            {% for background in backgrounds %}
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        {% if background.image_url %}
+                            <img src="{{ background.image_url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="{{ background.name }}">
+                        {% else %}
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-image fa-3x mb-2"></i>
+                                    <p>Image generation in progress...</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ background.name }}</h5>
+                            <p class="card-text">{{ background.description|truncatewords:15 }}</p>
+                            {% if background.generated_image_url %}
+                                <small class="text-success">✅ AI Generated</small>
+                            {% else %}
+                                <small class="text-warning">⏳ Processing...</small>
+                            {% endif %}
+                            <br>
+                            <a href="{% url 'delete_background' background.id %}" class="btn btn-danger btn-sm mt-2" 
+                               onclick="return confirm('Are you sure?')">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <h5>🎨 Welcome to AI Background Generator!</h5>
+                        <p>No backgrounds created yet. Create your first AI-generated background using the form!</p>
+                        <p><strong>How it works:</strong></p>
+                        <ul>
+                            <li>Describe your ideal background scene</li>
+                            <li>Our AI will enhance your description</li>
+                            <li>Multiple AI services will generate your image</li>
+                            <li>If AI services are busy, you'll get a beautiful placeholder</li>
+                        </ul>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>🎨 Generate New Background</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info small">
+                    <strong>💡 Tips for better results:</strong><br>
+                    • Be specific about colors, lighting, and mood<br>
+                    • Mention the time of day (sunset, morning, etc.)<br>
+                    • Include environmental details (mountains, beach, forest)<br>
+                    • Avoid mentioning people or characters
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-magic"></i> Generate Background
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
