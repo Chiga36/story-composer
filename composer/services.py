@@ -9,7 +9,9 @@ import logging
 import hashlib
 import time
 
+
 logger = logging.getLogger(__name__)
+
 
 class AIService:
     def __init__(self):
@@ -63,6 +65,7 @@ class AIService:
     def _fallback_scene_prompt(self, background_desc, character_desc, position, action):
         """Fallback scene prompt generation without AI"""
         return f"{character_desc} positioned on the {position} side, {action}, in a scene with {background_desc}, high quality, detailed"
+
 
 class ImageGenerationService:
     
@@ -235,8 +238,8 @@ class ImageGenerationService:
             return None
     
     @staticmethod
-    def _create_character_placeholder(prompt, prefix, width=800, height=1024):
-        """Create a character-specific placeholder with avatar-style design"""
+    def _create_character_placeholder(prompt, prefix, width=768, height=1024):
+        """Create VERTICAL character-specific placeholder"""
         try:
             from PIL import Image, ImageDraw, ImageFont
             import textwrap
@@ -263,11 +266,11 @@ class ImageGenerationService:
             
             colors = character_schemes[scheme_key]
             
-            # Create background with character silhouette effect
+            # Create VERTICAL background
             img = Image.new('RGB', (width, height), colors[0])
             draw = ImageDraw.Draw(img)
             
-            # Create gradient background
+            # Create vertical gradient background
             for i in range(height):
                 ratio = i / height
                 r = int(colors[0][0] * (1 - ratio) + colors[1][0] * ratio)
@@ -275,88 +278,114 @@ class ImageGenerationService:
                 b = int(colors[0][2] * (1 - ratio) + colors[1][2] * ratio)
                 draw.line([(0, i), (width, i)], fill=(r, g, b))
             
-            # Draw a character silhouette shape
+            # Draw FULL BODY character silhouette
             center_x = width // 2
-            center_y = height // 2
             
-            # Simple character silhouette (head, shoulders, body)
-            # Head
-            head_radius = 60
-            draw.ellipse([center_x - head_radius, center_y - 200, 
-                         center_x + head_radius, center_y - 80], 
-                        fill=(colors[2][0], colors[2][1], colors[2][2], 100))
+            # Head (top portion)
+            head_radius = 45
+            head_y = 120
+            draw.ellipse([center_x - head_radius, head_y, 
+                         center_x + head_radius, head_y + head_radius * 2], 
+                        fill=(colors[2][0], colors[2][1], colors[2][2], 120))
             
-            # Shoulders/torso
-            draw.rectangle([center_x - 80, center_y - 80, center_x + 80, center_y + 100], 
-                          fill=(colors[2][0], colors[2][1], colors[2][2], 80))
+            # Torso (middle portion)
+            torso_width = 80
+            torso_top = head_y + head_radius * 2
+            torso_bottom = torso_top + 200
+            draw.rectangle([center_x - torso_width//2, torso_top, 
+                           center_x + torso_width//2, torso_bottom], 
+                          fill=(colors[2][0], colors[2][1], colors[2][2], 100))
+            
+            # Legs (bottom portion) - FULL BODY
+            leg_width = 25
+            leg_top = torso_bottom
+            leg_bottom = height - 150
+            
+            # Left leg
+            draw.rectangle([center_x - torso_width//4 - leg_width//2, leg_top, 
+                           center_x - torso_width//4 + leg_width//2, leg_bottom], 
+                          fill=(colors[2][0], colors[2][1], colors[2][2], 100))
+            
+            # Right leg
+            draw.rectangle([center_x + torso_width//4 - leg_width//2, leg_top, 
+                           center_x + torso_width//4 + leg_width//2, leg_bottom], 
+                          fill=(colors[2][0], colors[2][1], colors[2][2], 100))
+            
+            # Arms
+            arm_width = 20
+            arm_length = 120
+            arm_y = torso_top + 30
+            
+            # Left arm
+            draw.rectangle([center_x - torso_width//2 - arm_width, arm_y, 
+                           center_x - torso_width//2, arm_y + arm_length], 
+                          fill=(colors[2][0], colors[2][1], colors[2][2], 100))
+            
+            # Right arm
+            draw.rectangle([center_x + torso_width//2, arm_y, 
+                           center_x + torso_width//2 + arm_width, arm_y + arm_length], 
+                          fill=(colors[2][0], colors[2][1], colors[2][2], 100))
             
             # Try to use better fonts
             try:
-                title_font = ImageFont.truetype("arial.ttf", 28)
-                font = ImageFont.truetype("arial.ttf", 16)
-                small_font = ImageFont.truetype("arial.ttf", 14)
+                title_font = ImageFont.truetype("arial.ttf", 24)
+                font = ImageFont.truetype("arial.ttf", 14)
+                small_font = ImageFont.truetype("arial.ttf", 12)
             except:
                 title_font = ImageFont.load_default()
                 font = ImageFont.load_default()
                 small_font = ImageFont.load_default()
             
-            # Draw title
-            title = "🛡️ Character Portrait"
+            # Draw title at top
+            title = "🛡️ Full Body Character"
             title_bbox = draw.textbbox((0, 0), title, font=title_font)
             title_width = title_bbox[2] - title_bbox[0]
             title_x = (width - title_width) // 2
             
             # Shadow
-            draw.text((title_x + 2, 42), title, fill=(0, 0, 0, 100), font=title_font)
+            draw.text((title_x + 1, 31), title, fill=(0, 0, 0, 100), font=title_font)
             # Main text
-            draw.text((title_x, 40), title, fill=(255, 255, 255), font=title_font)
+            draw.text((title_x, 30), title, fill=(255, 255, 255), font=title_font)
             
-            # Draw character description in a nice box
-            box_padding = 30
-            box_top = center_y + 150
-            box_bottom = height - 80
+            # Draw character description at bottom
+            box_padding = 20
+            box_top = leg_bottom + 20
+            box_bottom = height - 40
             
-            # Draw semi-transparent box
+            # Draw semi-transparent box for text
             overlay = Image.new('RGBA', (width, height), (0, 0, 0, 0))
             overlay_draw = ImageDraw.Draw(overlay)
             overlay_draw.rectangle([box_padding, box_top, width-box_padding, box_bottom], 
-                                 fill=(255, 255, 255, 220))
+                                 fill=(255, 255, 255, 200))
             img = Image.alpha_composite(img.convert('RGBA'), overlay).convert('RGB')
             
             # Wrap and draw character description
-            wrapped_text = textwrap.fill(prompt, width=45)
+            wrapped_text = textwrap.fill(prompt.replace("full body portrait of ", ""), width=35)
             lines = wrapped_text.split('\n')
             
-            y_offset = box_top + 20
-            for line in lines[:4]:  # Limit to 4 lines
+            y_offset = box_top + 10
+            for line in lines[:3]:  # Limit to 3 lines
                 bbox = draw.textbbox((0, 0), line, font=font)
                 line_width = bbox[2] - bbox[0]
                 x = (width - line_width) // 2
                 draw.text((x, y_offset), line, fill=(60, 60, 60), font=font)
-                y_offset += 20
+                y_offset += 16
             
             # Add status message
-            status_msg = "🔄 AI Character Generator Busy - Themed Placeholder"
+            status_msg = "AI Character Generator Busy"
             status_bbox = draw.textbbox((0, 0), status_msg, font=small_font)
             status_width = status_bbox[2] - status_bbox[0]
             status_x = (width - status_width) // 2
-            draw.text((status_x, height - 50), status_msg, fill=(255, 255, 255), font=small_font)
-            
-            # Add footer
-            footer = "AI will generate your character art later"
-            footer_bbox = draw.textbbox((0, 0), footer, font=small_font)
-            footer_width = footer_bbox[2] - footer_bbox[0]
-            footer_x = (width - footer_width) // 2
-            draw.text((footer_x, height - 25), footer, fill=(255, 255, 255), font=small_font)
+            draw.text((status_x, height - 25), status_msg, fill=(255, 255, 255), font=small_font)
             
             # Save image
-            filename = f"{prefix}_character_themed_{uuid.uuid4().hex[:8]}.png"
+            filename = f"{prefix}_fullbody_{uuid.uuid4().hex[:8]}.png"
             media_dir = os.path.join(settings.MEDIA_ROOT, 'generated_images')
             os.makedirs(media_dir, exist_ok=True)
             filepath = os.path.join(media_dir, filename)
             
             img.save(filepath, quality=95)
-            print(f"✅ Character themed placeholder for {prefix} created: {filename}")
+            print(f"✅ VERTICAL full body character placeholder created: {filename}")
             return f"{settings.MEDIA_URL}generated_images/{filename}"
             
         except Exception as e:
@@ -381,36 +410,49 @@ class ImageGenerationService:
     
     @staticmethod
     def generate_character_image(description):
-        """Generate character image - NO random photos, character-specific fallbacks"""
-        enhanced_prompt = f"portrait {description} character design fantasy art"
+        """Generate VERTICAL FULL BODY character image"""
+        # Enhanced prompt for full body vertical characters
+        enhanced_prompt = f"full body portrait of {description}, standing, vertical orientation, complete figure, detailed character art, fantasy style"
         
-        print(f"🚀 Starting character-specific image generation")
+        print(f"🚀 Starting VERTICAL character image generation")
         print(f"📝 Character prompt: {enhanced_prompt}")
         
-        # Try AI services first
-        result = ImageGenerationService._try_pollinations_with_retry(enhanced_prompt, "character", width=800, height=1024)
+        # Try AI services first with VERTICAL dimensions
+        result = ImageGenerationService._try_pollinations_with_retry(
+            enhanced_prompt, "character", 
+            width=768, height=1024  # VERTICAL aspect ratio
+        )
         if result:
             return result
         
-        # Create character-specific placeholder (NOT random photos!)
-        print("⚠️ AI services unavailable - creating character placeholder")
-        result = ImageGenerationService._create_character_placeholder(enhanced_prompt, "character", width=800, height=1024)
+        # Create character-specific placeholder (VERTICAL)
+        print("⚠️ AI services unavailable - creating VERTICAL character placeholder")
+        result = ImageGenerationService._create_character_placeholder(
+            enhanced_prompt, "character", 
+            width=768, height=1024  # VERTICAL aspect ratio
+        )
         return result
     
     @staticmethod
     def generate_background_image(description):
-        """Generate background image - NO random photos, themed placeholders"""
-        enhanced_prompt = f"{description} landscape environment"
+        """Generate HORIZONTAL background image - NO random photos, themed placeholders"""
+        enhanced_prompt = f"{description} landscape environment wide view"
         
-        print(f"🚀 Starting background image generation")
+        print(f"🚀 Starting HORIZONTAL background image generation")
         print(f"📝 Background prompt: {enhanced_prompt}")
         
-        # Try AI services first
-        result = ImageGenerationService._try_pollinations_with_retry(enhanced_prompt, "background")
+        # Try AI services first with HORIZONTAL dimensions
+        result = ImageGenerationService._try_pollinations_with_retry(
+            enhanced_prompt, "background",
+            width=1024, height=768  # HORIZONTAL aspect ratio
+        )
         if result:
             return result
         
-        # Create themed placeholder (NO random photos!)
-        print("⚠️ AI services unavailable - creating themed background placeholder")
-        result = ImageGenerationService._create_enhanced_placeholder(enhanced_prompt, "background")
+        # Create themed placeholder (HORIZONTAL)
+        print("⚠️ AI services unavailable - creating HORIZONTAL themed background placeholder")
+        result = ImageGenerationService._create_enhanced_placeholder(
+            enhanced_prompt, "background",
+            width=1024, height=768  # HORIZONTAL aspect ratio
+        )
         return result
