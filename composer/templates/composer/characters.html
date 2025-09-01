@@ -1,116 +1,135 @@
 {% extends 'composer/base.html' %}
 
+{% block title %}AI Characters - Scene Composer{% endblock %}
+
 {% block content %}
-<style>
-.character-card {
-    margin-bottom: 2rem;
-}
+<div class="container">
+    <!-- Page Header -->
+    <div class="page-header fade-in">
+        <h1><i class="fas fa-user-ninja me-3"></i>AI-Generated Characters</h1>
+        <p>Create unique character portraits for your stories</p>
+    </div>
 
-.character-image {
-    width: 100%;
-    max-width: 250px;
-    height: 350px;
-    object-fit: cover;
-    object-position: center top;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    display: block;
-    margin: 0 auto 15px auto;
-}
-
-.background-image {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.card {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.card-body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-</style>
-
-<h2>My AI-Generated Characters</h2>
-
-<div class="row">
-    <div class="col-md-9">
-        <div class="row">
-            {% for character in characters %}
-                <div class="col-md-4 character-card">
-                    <div class="card h-100">
-                        {% if character.image_url %}
-                            <img src="{{ character.image_url }}" class="character-image" alt="{{ character.name }}">
-                        {% else %}
-                            <div class="character-image bg-light d-flex align-items-center justify-content-center">
-                                <div class="text-center text-muted">
-                                    <i class="fas fa-user fa-3x mb-2"></i>
-                                    <p>Generating...</p>
+    <div class="row">
+        <!-- Characters Grid -->
+        <div class="col-lg-8">
+            {% if characters %}
+                <div class="grid-container">
+                    {% for character in characters %}
+                        <div class="modern-card slide-in">
+                            <div class="card-image-container" style="height: 350px;">
+                                {% if character.image_url %}
+                                    <img src="{{ character.image_url }}" alt="{{ character.name }}" class="character-image">
+                                    <div class="image-overlay"></div>
+                                {% else %}
+                                    <div class="d-flex align-items-center justify-content-center h-100 bg-light">
+                                        <div class="text-center">
+                                            <i class="fas fa-user-ninja fa-3x text-muted mb-2"></i>
+                                            <p class="text-muted">Generating...</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">{{ character.name }}</h5>
+                                <p class="card-text">{{ character.description|truncatewords:20 }}</p>
+                                {% if character.generated_image_url %}
+                                    <div class="card-badge">
+                                        <i class="fas fa-check me-1"></i>AI Generated Full Body
+                                    </div>
+                                {% else %}
+                                    <div class="card-badge" style="background: var(--warning-color);">
+                                        <i class="fas fa-clock me-1"></i>Processing
+                                    </div>
+                                {% endif %}
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar-alt me-1"></i>
+                                        {{ character.created_at|date:"M d, Y" }}
+                                    </small>
+                                    <a href="{% url 'delete_character' character.id %}" 
+                                       class="btn btn-danger-modern btn-sm"
+                                       onclick="return confirm('Are you sure you want to delete this character?')">
+                                        <i class="fas fa-trash me-1"></i>Delete
+                                    </a>
                                 </div>
                             </div>
-                        {% endif %}
-                        <div class="card-body">
-                            <h5 class="card-title">{{ character.name }}</h5>
-                            <p class="card-text flex-grow-1">{{ character.description|truncatewords:15 }}</p>
-                            {% if character.generated_image_url %}
-                                <small class="text-success">✅ AI Generated Full Body</small>
-                            {% else %}
-                                <small class="text-warning">⏳ Processing...</small>
-                            {% endif %}
-                            <div class="mt-2">
-                                <a href="{% url 'delete_character' character.id %}" class="btn btn-danger btn-sm" 
-                                   onclick="return confirm('Are you sure?')">Delete</a>
-                            </div>
                         </div>
-                    </div>
+                    {% endfor %}
                 </div>
-            {% empty %}
-                <div class="col-12">
-                    <div class="alert alert-info">
-                        <h5>🛡️ Welcome to AI Character Generator!</h5>
-                        <p>No characters created yet. Create your first AI-generated full body character!</p>
-                        <p><strong>How it works:</strong></p>
-                        <ul>
-                            <li>Describe your character (warrior, wizard, archer, etc.)</li>
-                            <li>AI generates a full body portrait in vertical orientation</li>
-                            <li>Perfect for character sheets and RPG games</li>
-                        </ul>
+            {% else %}
+                <div class="empty-state fade-in">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-user-ninja"></i>
                     </div>
+                    <h3>No characters yet</h3>
+                    <p>Create your first AI-generated character using the form on the right. Describe any character and watch AI create a full-body portrait!</p>
                 </div>
-            {% endfor %}
+            {% endif %}
         </div>
-    </div>
-    
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-header">
-                <h5>🛡️ Generate Full Body Character</h5>
-            </div>
-            <div class="card-body">
-                <div class="alert alert-info small">
-                    <strong>💡 Tips for full body characters:</strong><br>
-                    • Mention profession (knight, wizard, archer)<br>
+
+        <!-- Creation Form -->
+        <div class="col-lg-4">
+            <div class="form-container">
+                <h4 class="mb-3">
+                    <i class="fas fa-user-plus me-2" style="color: var(--secondary-color);"></i>
+                    Generate New Character
+                </h4>
+                
+                <div class="form-tips">
+                    <strong><i class="fas fa-lightbulb me-2"></i>Character Tips:</strong><br>
+                    • Mention profession (knight, wizard)<br>
                     • Include clothing/armor details<br>
                     • Specify weapons or accessories<br>
-                    • Describe pose (standing, ready for battle)
+                    • Describe pose (standing, sitting)
                 </div>
+
                 <form method="post">
                     {% csrf_token %}
-                    {{ form.as_p }}
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-magic"></i> Generate Full Body Character
+                    <div class="mb-3">
+                        <label for="{{ form.name.id_for_label }}" class="form-label">
+                            <i class="fas fa-id-badge me-1"></i>Character Name
+                        </label>
+                        <input type="text" class="form-control form-control-modern" 
+                               id="{{ form.name.id_for_label }}" 
+                               name="{{ form.name.name }}" 
+                               placeholder="e.g., Elven Warrior"
+                               value="{{ form.name.value|default:'' }}" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">
+                            <i class="fas fa-pen me-1"></i>Description
+                        </label>
+                        <textarea class="form-control form-control-modern" 
+                                  id="{{ form.description.id_for_label }}" 
+                                  name="{{ form.description.name }}" 
+                                  rows="4" 
+                                  placeholder="Describe the character you want to generate..."
+                                  required>{{ form.description.value|default:'' }}</textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-modern btn-primary-modern w-100">
+                        <i class="fas fa-wand-magic-sparkles me-2"></i>Generate Full Body Character
                     </button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.character-image {
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+    object-position: center top;
+}
+
+@media (max-width: 768px) {
+    .character-image {
+        height: 300px;
+    }
+}
+</style>
 {% endblock %}

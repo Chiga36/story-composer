@@ -61,7 +61,11 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # Static files settings
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+    BASE_DIR / 'composer' / 'static',
+]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # API Keys
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')

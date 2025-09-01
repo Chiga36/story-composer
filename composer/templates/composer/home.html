@@ -1,44 +1,143 @@
 {% extends 'composer/base.html' %}
 
+{% block title %}Home - AI Scene Composer{% endblock %}
+
 {% block content %}
-<div class="row">
-    <div class="col-md-8 mx-auto text-center">
-        <h1>Welcome to Scene Composer</h1>
-        <p class="lead">Create amazing scenes by combining your custom backgrounds and characters with AI-powered image generation.</p>
-        
-        {% if user.is_authenticated %}
-            <div class="row mt-5">
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5>Backgrounds</h5>
-                            <p>Create and manage your background scenes</p>
-                            <a href="{% url 'backgrounds' %}" class="btn btn-primary">Manage Backgrounds</a>
+<div class="container">
+    {% if user.is_authenticated %}
+        <!-- Welcome Header -->
+        <div class="page-header fade-in">
+            <h1><i class="fas fa-sparkles me-3"></i>Welcome back, {{ user.first_name|default:user.username }}!</h1>
+            <p>Create amazing scenes with AI-powered backgrounds and characters</p>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="row mb-5">
+            <div class="col-md-4">
+                <div class="modern-card text-center">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fas fa-mountain fa-3x" style="color: var(--primary-color);"></i>
                         </div>
+                        <h5 class="card-title">Backgrounds</h5>
+                        <p class="card-text">AI-generated environments for your scenes</p>
+                        <a href="{% url 'backgrounds' %}" class="btn btn-modern btn-primary-modern">
+                            <i class="fas fa-plus me-2"></i>Create Background
+                        </a>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5>Characters</h5>
-                            <p>Create and manage your characters</p>
-                            <a href="{% url 'characters' %}" class="btn btn-primary">Manage Characters</a>
+            </div>
+            <div class="col-md-4">
+                <div class="modern-card text-center">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fas fa-user-ninja fa-3x" style="color: var(--secondary-color);"></i>
                         </div>
+                        <h5 class="card-title">Characters</h5>
+                        <p class="card-text">Design unique characters for your stories</p>
+                        <a href="{% url 'characters' %}" class="btn btn-modern btn-primary-modern">
+                            <i class="fas fa-plus me-2"></i>Create Character
+                        </a>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5>Create Scene</h5>
-                            <p>Compose backgrounds and characters</p>
-                            <a href="{% url 'create_scene' %}" class="btn btn-success">Create Scene</a>
+            </div>
+            <div class="col-md-4">
+                <div class="modern-card text-center">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fas fa-magic fa-3x" style="color: var(--success-color);"></i>
+                        </div>
+                        <h5 class="card-title">Complete Scenes</h5>
+                        <p class="card-text">Combine characters and backgrounds</p>
+                        <a href="{% url 'create_scene' %}" class="btn btn-modern btn-primary-modern">
+                            <i class="fas fa-wand-magic-sparkles me-2"></i>Create Scene
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- How It Works -->
+        <div class="row">
+            <div class="col-12">
+                <div class="modern-card">
+                    <div class="card-body">
+                        <h3 class="text-center mb-4">
+                            <i class="fas fa-lightbulb me-2" style="color: var(--warning-color);"></i>
+                            How Scene Composer Works
+                        </h3>
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                         style="width: 60px; height: 60px; background: var(--primary-color); color: white;">
+                                        <span class="fw-bold fs-4">1</span>
+                                    </div>
+                                </div>
+                                <h5>Describe</h5>
+                                <p class="text-muted">Write a description of what you want to create</p>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                         style="width: 60px; height: 60px; background: var(--secondary-color); color: white;">
+                                        <span class="fw-bold fs-4">2</span>
+                                    </div>
+                                </div>
+                                <h5>AI Enhancement</h5>
+                                <p class="text-muted">Our AI enhances your prompt for better results</p>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                         style="width: 60px; height: 60px; background: var(--success-color); color: white;">
+                                        <span class="fw-bold fs-4">3</span>
+                                    </div>
+                                </div>
+                                <h5>Generate</h5>
+                                <p class="text-muted">High-quality images are created instantly</p>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                         style="width: 60px; height: 60px; background: var(--warning-color); color: white;">
+                                        <span class="fw-bold fs-4">4</span>
+                                    </div>
+                                </div>
+                                <h5>Compose</h5>
+                                <p class="text-muted">Combine elements into complete scenes</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        {% else %}
-            <a href="{% url 'login' %}" class="btn btn-primary btn-lg">Get Started</a>
-        {% endif %}
-    </div>
+        </div>
+
+    {% else %}
+        <!-- Landing Page for Non-authenticated Users -->
+        <div class="page-header fade-in">
+            <h1><i class="fas fa-magic me-3"></i>AI Scene Composer</h1>
+            <p>Create stunning visual stories with AI-powered image generation</p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="modern-card text-center">
+                    <div class="card-body py-5">
+                        <h3 class="mb-4">Start Creating Amazing Scenes</h3>
+                        <p class="card-text mb-4">Join thousands of creators using AI to bring their stories to life</p>
+                        <div class="d-flex gap-3 justify-content-center">
+                            <a href="{% url 'signup' %}" class="btn btn-modern btn-primary-modern btn-lg">
+                                <i class="fas fa-user-plus me-2"></i>Get Started Free
+                            </a>
+                            <a href="{% url 'login' %}" class="btn btn-modern btn-outline-primary">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}
